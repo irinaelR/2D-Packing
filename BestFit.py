@@ -5,6 +5,57 @@ class Rectangle:
         self.x = None
         self.y = None
 
+def first_fit_dh(rectangles, W, H):
+    rectangles.sort(key=lambda r: r.height, reverse=True)
+
+    rows = {}
+
+    for rectangle in rectangles:
+        if rectangle.height <= H:
+            if len(rows) == 0:
+                first_row = Rectangle(W, rectangle.height)
+                first_row.x = 0
+                first_row.y = H - rectangle.height
+
+                rectangle.x = 0
+                rectangle.y = H - rectangle.height
+
+                rows[first_row] = [rectangle]
+            else:
+                added = False
+                occupied_height = 0
+                for row in rows:
+                    # the height of a row is defined by the height of its key
+                    occupied_height = occupied_height + row.height
+
+                    row_rectangles = rows[row]
+                    occupied_width = 0
+                    for r in row_rectangles:
+                        occupied_width = occupied_width + r.width
+                    
+                    if occupied_width + rectangle.width <= W:
+                        # if there is still horizontal space
+                        rectangle.x  = occupied_width
+                        rectangle.y = row.y
+
+                        rows[row].append(rectangle)
+                        added = True
+                        break
+                
+                if not added and occupied_height + rectangle.height <= H:
+                    # we'll try to make a new row
+                    new_row = Rectangle(W, rectangle.height)
+                    new_row.x = 0
+                    new_row.y = H - occupied_height - rectangle.height
+
+                    rectangle.x = 0
+                    rectangle.y = H - occupied_height - rectangle.height
+                    rows[new_row] = [rectangle]
+                
+
+    return rectangles
+
+
 def best_fit(rectangles, W, H):
     rectangles.sort(key=lambda r: r.height, reverse=True)
 
@@ -41,11 +92,24 @@ def best_fit(rectangles, W, H):
     
     return rectangles
 
-rectangles = [Rectangle(3, 2), Rectangle(2, 2), Rectangle(5, 4)]
-W, H = 4, 3
-placed_rectangles = best_fit(rectangles, W, H)
+rectangles = [Rectangle(1, 6), Rectangle(2, 5), Rectangle(2, 4), Rectangle(4, 3), Rectangle(1, 3), Rectangle(4, 5)]
+W, H = 8, 15
 
+# rectangles = [Rectangle(3, 2), Rectangle(2, 2), Rectangle(5, 4)]
+# W, H = 4, 3
+
+placed_rectangles = best_fit(rectangles, W, H)
+placed_rectangles2 = first_fit_dh(rectangles, W, H)
+
+print('First fit decreasing height')
 for rect in placed_rectangles:
+    if rect.x is not None and rect.y is not None:
+        print(f'Rectangle at ({rect.x}, {rect.y}) with width {rect.width} and height {rect.height}')
+    else:
+        print(f'Rectangle with width {rect.width} and height {rect.height} could not be placed')
+
+print('Best fit')
+for rect in placed_rectangles2:
     if rect.x is not None and rect.y is not None:
         print(f'Rectangle at ({rect.x}, {rect.y}) with width {rect.width} and height {rect.height}')
     else:
