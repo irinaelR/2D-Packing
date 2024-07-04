@@ -38,8 +38,6 @@ def first_fit(shapes, B):
 
     return bacs
 
-import sys
-
 def best_fit(shapes, B):
     bacs = [Bac([], B)] # we begin with one empty bac of the size B
 
@@ -47,7 +45,7 @@ def best_fit(shapes, B):
 
         if shape.size <= B:
 
-            min_space_left = sys.maxsize
+            min_space_left = float('inf')
             bac_index = -1
 
             for index, bac in enumerate(bacs):
@@ -75,7 +73,7 @@ def worst_fit(shapes, B):
 
         if shape.size <= B:
 
-            max_space_left = -sys.maxsize - 1
+            max_space_left = -float('inf') - 1
             bac_index = -1
 
             for index, bac in enumerate(bacs):
@@ -96,8 +94,33 @@ def worst_fit(shapes, B):
 
     return bacs
 
-B = 5
-shapes = [Shape(2), Shape(4), Shape(1), Shape(4), Shape(3)]
+import itertools
+def brute_force(shapes, B):
+    best_layout = None
+    min_nb = float('inf')
+
+    # permutation of the order of insertion of the shapes
+    for permutation in itertools.permutations(shapes):
+        bacs = []
+        for shape in permutation:
+            added = False
+            for b in bacs:
+                if b.get_occupied_surface() + shape.size <= b.size:
+                    b.shapes.append(shape)
+                    added = True
+                    break
+
+            if not added:
+                bacs.append(Bac([shape], B))
+        
+        if len(bacs) <= min_nb:
+            min_nb = len(bacs)
+            best_layout = bacs
+
+    return best_layout
+
+B = 10
+shapes = [Shape(5), Shape(2), Shape(4), Shape(1), Shape(3), Shape(4)]
 
 print("First Fit 1D")
 filled_bacs = first_fit(shapes, B)
@@ -113,6 +136,12 @@ for index, bac in enumerate(filled_bacs):
 
 print("worst Fit 1D")
 filled_bacs = worst_fit(shapes, B)
+    # i want to print the bac's index and its shapes array (bac.shapes)
+for index, bac in enumerate(filled_bacs):
+    print(f"Bac index: {index}, Shapes: {[shape.size for shape in bac.shapes]}")
+
+print("Brute force 1D")
+filled_bacs = brute_force(shapes, B)
     # i want to print the bac's index and its shapes array (bac.shapes)
 for index, bac in enumerate(filled_bacs):
     print(f"Bac index: {index}, Shapes: {[shape.size for shape in bac.shapes]}")
