@@ -15,6 +15,9 @@ class Bac(Shape):
             surface += shape.size
 
         return surface
+    
+    def get_remaining_surface(self):
+        return self.size - self.get_occupied_surface()
 
 def first_fit(shapes, B):
     bacs = [Bac([], B)] # we begin with one empty bac of the size B
@@ -35,10 +38,49 @@ def first_fit(shapes, B):
 
     return bacs
 
-B = 2
-shapes = [Shape(4), Shape(2), Shape(1), Shape(4), Shape(3)]
+import sys
+def best_fit(shapes, B):
+    bacs = [Bac([], B)] # we begin with one empty bac of the size B
 
+    for shape in shapes:
+
+        if shape.size <= B:
+
+            min_space_left = sys.maxsize
+            bac_index = -1
+
+            for index, bac in enumerate(bacs):
+
+                space_left = bac.get_remaining_surface() - shape.size
+
+                if min_space_left > space_left and space_left >= 0:
+                    # minimizing the space left after insertion AND making sure the shape can actually fit
+                    bac_index = index
+                    min_space_left = space_left
+            
+            if bac_index >= 0:
+                # a valid bac was found to insert the shape into
+                bacs[bac_index].shapes.append(shape)
+            else:
+                # we add a new bac to accomodate
+                bacs.append(Bac([shape], B))
+
+    return bacs
+            
+
+
+B = 5
+shapes = [Shape(2), Shape(4), Shape(1), Shape(4), Shape(3)]
+
+print("First Fit 1D")
 filled_bacs = first_fit(shapes, B)
     # i want to print the bac's index and its shapes array (bac.shapes)
 for index, bac in enumerate(filled_bacs):
     print(f"Bac index: {index}, Shapes: {[shape.size for shape in bac.shapes]}")
+
+print("Best Fit 1D")
+filled_bacs = best_fit(shapes, B)
+    # i want to print the bac's index and its shapes array (bac.shapes)
+for index, bac in enumerate(filled_bacs):
+    print(f"Bac index: {index}, Shapes: {[shape.size for shape in bac.shapes]}")
+
