@@ -13,7 +13,7 @@ class Fenetre(Tk):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.title("2D packing sans rotation")
-        # self.resizable(False, False) 
+        self.resizable(False, False) 
 
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
