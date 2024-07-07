@@ -3,6 +3,10 @@ from objet.rectangle import Rectangle
 def next_fit_dh(rectangles, W, H):
     rectangles = [rect for rect in rectangles if rect.width <= W and rect.height <= H]
     rectangles.sort(key=lambda r: r.height, reverse=True)
+
+    for rect in rectangles:
+        rect.x = None
+        rect.y = None
     
     current_row = None
     current_row_rect = []

@@ -2,6 +2,9 @@ def best_fit(rectangles, W, H):
     rectangles = [rect for rect in rectangles if rect.width <= W and rect.height <= H]
     rectangles.sort(key=lambda r: r.height, reverse=True)
 
+    for rect in rectangles:
+        rect.x = None
+        rect.y = None
 
     free_spaces = [(0, 0, W, H)]
 
