@@ -1,5 +1,7 @@
 def best_fit(rectangles, W, H):
+    rectangles = [rect for rect in rectangles if rect.width <= W and rect.height <= H]
     rectangles.sort(key=lambda r: r.height, reverse=True)
+
 
     free_spaces = [(0, 0, W, H)]
 
