@@ -1,6 +1,7 @@
 from objet.rectangle import Rectangle
 
 def first_fit_dh(rectangles, W, H):
+    print(f"width:{W} and height:{H}")
     rectangles = [rect for rect in rectangles if rect.width <= W and rect.height <= H]
     rectangles.sort(key=lambda r: r.height, reverse=True)
 

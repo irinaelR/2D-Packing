@@ -33,11 +33,11 @@ class Conteneur(Frame):
     canvas: Canvas = property(_get_canvas, _set_canvas)
     rectangles: list[Rectangle] = property(_get_rectangles, _set_rectangles)
         
-    def create_canvas(self, width, height):
+    def create_canvas(self, W, H):
         for widget in self.winfo_children():
             widget.destroy()
 
-        self.canvas = Canvas(self, width=width, height=height, bg="white")
+        self.canvas = Canvas(self, width=W, height=H, bg="white", highlightthickness=0)
         self.canvas.place(relx=0.5, rely=0.5, anchor="center")
         
     def add_rectangle(self, rect: Rectangle):
@@ -45,11 +45,11 @@ class Conteneur(Frame):
         
     def choose_fit(self, fit, rect_temp, rect_fitted_temp):
         for rect in self.rectangles_fitted:
-            print(rect)
             rect.undraw(self.canvas)
             
         self.fit_chosen = fit
-        self.rectangles_fitted = Utilitaire.choose_fit(self.fit_chosen, self.rectangles, self.canvas.winfo_width(), self.canvas.winfo_height())
+        self.rectangles_fitted = Utilitaire.choose_fit(self.fit_chosen, self.rectangles, int(self.canvas.cget('width')), int(self.canvas.cget('height')))
+        print(f"Longueur de fitted {self.rectangles_fitted}")
         
         for rect in self.rectangles_fitted:
             rect.draw(self.canvas)

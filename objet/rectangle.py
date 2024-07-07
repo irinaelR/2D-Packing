@@ -81,7 +81,7 @@ class Rectangle:
         return "#"+''.join([random.choice('0123456789ABCDEF') for _ in range(6)])
 
     def draw(self, canvas: Canvas):
-        self.canvas_id = canvas.create_rectangle(self.x, self.y, self.x+self.width, self.y+self.height, fill = self.color)
+        self.canvas_id = canvas.create_rectangle(self.x, self.y, self.x+self.width, self.y+self.height, fill = self.color, outline="black")
         self.text_id = canvas.create_text(self.x + self.width/2, self.y + self.height/2, text=str(self.index), font=("Helvetica", 12))
         
     def undraw(self, canvas: Canvas):
