@@ -108,7 +108,8 @@ class Formulaire(Frame):
         self._type_combobox['values'] = ('First fit decreasing height (FFDH)',
                                          'Next fit decreasing height (NFDH)',
                                          'Best fit',
-                                         'Brute force'   
+                                         'Brute force',   
+                                         'Brute force avec rotation'   
                                         )
         self._type_combobox.grid(row=1, columnspan=2, pady=(0, 10))
         self._type_combobox.bind('<<ComboboxSelected>>', self.modify_fit)

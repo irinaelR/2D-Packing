@@ -1,5 +1,6 @@
 from utils.best_fit import best_fit
 from utils.brute_force import brute_force
+from utils.brute_force_rotation import brute_force_rotation
 from utils.next_fit import next_fit_dh
 from utils.first_fit import first_fit_dh
 
@@ -16,3 +17,5 @@ class Utilitaire:
                 return best_fit(rectangles, W, H)
             case "Brute force":
                 return brute_force(rectangles, W, H)
+            case "Brute force avec rotation":
+                return brute_force_rotation(rectangles, W, H)
