@@ -183,6 +183,8 @@ def best_fit(rectangles, W, H):
 import itertools
 
 def brute_force(rectangles, W, H):
+    rectangles = [rect for rect in rectangles if rect.width <= W and rect.height <= H]
+
     placed_rectangles = []
     max_placed_rectangles = 0
     insertion_order = None
@@ -201,29 +203,33 @@ def brute_force(rectangles, W, H):
             else:
                 added = False
                 next_y = -1
-                for placed_rect in actual_layout:
-                    if placed_rect.y + placed_rect.height > next_y:
-                        next_y = placed_rect.y + placed_rect.height
+                round = 1
+                while round <= 2 and added is False:
+                    for placed_rect in actual_layout:
+                        if round == 1 and placed_rect.y + placed_rect.height > next_y:
+                            next_y = placed_rect.y + placed_rect.height
 
-                    if placed_rect.side_ok(actual_layout) and placed_rect.can_fit_on_side(rectangle, W, H):
-                        rectangle.x = placed_rect.x + placed_rect.width
-                        rectangle.y = placed_rect.y
+                        if round == 1 and placed_rect.side_ok(actual_layout) and placed_rect.can_fit_on_side(rectangle, W, H):
+                            rectangle.x = placed_rect.x + placed_rect.width
+                            rectangle.y = placed_rect.y
 
-                        # if the rectangle can be placed next to rect_in_list WITHOUT overlapping any other
-                        if not rectangle.has_intersection_in_list(temp_layout):
-                            count_placed += 1
-                            added = True
-                            break
+                            # if the rectangle can be placed next to placed_rect WITHOUT overlapping any other
+                            if not rectangle.has_intersection_in_list(temp_layout):
+                                count_placed += 1
+                                added = True
+                                break
 
-                    elif placed_rect.bottom_ok(actual_layout) and placed_rect.can_fit_under(rectangle, W, H):
-                        rectangle.x = placed_rect.x
-                        rectangle.y = placed_rect.y + placed_rect.height
+                        elif round == 2 and placed_rect.bottom_ok(actual_layout) and placed_rect.can_fit_under(rectangle, W, H):
+                            rectangle.x = placed_rect.x
+                            rectangle.y = placed_rect.y + placed_rect.height
 
-                        # if the rectangle can be placed next to rect_in_list WITHOUT overlapping any other
-                        if not rectangle.has_intersection_in_list(temp_layout):
-                            count_placed += 1
-                            added = True
-                            break
+                            # if the rectangle can be placed next to rect_in_list WITHOUT overlapping any other
+                            if not rectangle.has_intersection_in_list(temp_layout):
+                                count_placed += 1
+                                added = True
+                                break
+
+                    round += 1
                 
                 if not added:
                     if next_y + rectangle.height <= H and rectangle.width <= W:
@@ -237,6 +243,7 @@ def brute_force(rectangles, W, H):
                 temp_layout.append(rectangle)
 
         if max_placed_rectangles <= count_placed:
+            # print(f"Went from {max_placed_rectangles} rectangles to {count_placed}")
             max_placed_rectangles = count_placed
             placed_rectangles = temp_layout
             insertion_order = permutation
@@ -339,38 +346,38 @@ def brute_force_with_rotation(rectangles, W, H):
     return placed_rectangles, insertion_order
 
 
-rectangles = [Rectangle(4, 3), Rectangle(7, 4), Rectangle(4, 3), Rectangle(3, 3), Rectangle(2, 1), Rectangle(2, 8), Rectangle(10, 1)]
-W, H = 10, 10
+rectangles = [Rectangle(4, 3), Rectangle(4, 4), Rectangle(4, 3), Rectangle(3, 3), Rectangle(2, 1), Rectangle(2, 5)]
+W, H = 10, 6
 
 # rectangles = [Rectangle(3, 2), Rectangle(2, 2), Rectangle(5, 4)]
 # W, H = 4, 3
 
-# placed_rectangles = next_fit_dh(rectangles, W, H)
-# print('Next fit decreasing height')
-# for rect in placed_rectangles:
-#     if rect.x is not None and rect.y is not None:
-#         print(f'Rectangle at ({rect.x}, {rect.y}) with width {rect.width} and height {rect.height}')
-#     else:
-#         print(f'Rectangle with width {rect.width} and height {rect.height} could not be placed')
+placed_rectangles = next_fit_dh(rectangles, W, H)
+print('Next fit decreasing height')
+for rect in placed_rectangles:
+    if rect.x is not None and rect.y is not None:
+        print(f'Rectangle at ({rect.x}, {rect.y}) with width {rect.width} and height {rect.height}')
+    else:
+        print(f'Rectangle with width {rect.width} and height {rect.height} could not be placed')
 
 
-# placed_rectangles2 = first_fit_dh(rectangles, W, H)
-# print('First fit')
-# for rect in placed_rectangles2:
-#     if rect.x is not None and rect.y is not None:
-#         print(f'Rectangle at ({rect.x}, {rect.y}) with width {rect.width} and height {rect.height}')
-#     else:
-#         print(f'Rectangle with width {rect.width} and height {rect.height} could not be placed')
+placed_rectangles2 = first_fit_dh(rectangles, W, H)
+print('First fit')
+for rect in placed_rectangles2:
+    if rect.x is not None and rect.y is not None:
+        print(f'Rectangle at ({rect.x}, {rect.y}) with width {rect.width} and height {rect.height}')
+    else:
+        print(f'Rectangle with width {rect.width} and height {rect.height} could not be placed')
 
-# placed_rectangles3 = best_fit(rectangles, W, H)
-# print('Best fit')
-# for rect in placed_rectangles3:
-#     if rect.x is not None and rect.y is not None:
-#         print(f'Rectangle at ({rect.x}, {rect.y}) with width {rect.width} and height {rect.height}')
-#     else:
-#         print(f'Rectangle with width {rect.width} and height {rect.height} could not be placed')
+placed_rectangles3 = best_fit(rectangles, W, H)
+print('Best fit')
+for rect in placed_rectangles3:
+    if rect.x is not None and rect.y is not None:
+        print(f'Rectangle at ({rect.x}, {rect.y}) with width {rect.width} and height {rect.height}')
+    else:
+        print(f'Rectangle with width {rect.width} and height {rect.height} could not be placed')
 
-#         placed_rectangles3 = best_fit(rectangles, W, H)
+        placed_rectangles3 = best_fit(rectangles, W, H)
 
 placed_rectangles4, insertion_order = brute_force(rectangles, W, H)
 print('Brute force')
@@ -381,11 +388,11 @@ for rect in placed_rectangles4:
     else:
         print(f'Rectangle with width {rect.width} and height {rect.height} could not be placed')
 
-placed_rectangles4, insertion_order = brute_force_with_rotation(rectangles, W, H)
-print('Brute force with rotation')
-print(insertion_order)
-for rect in placed_rectangles4:
-    if rect.x is not None and rect.y is not None:
-        print(f'Rectangle at ({rect.x}, {rect.y}) with width {rect.width} and height {rect.height}')
-    else:
-        print(f'Rectangle with width {rect.width} and height {rect.height} could not be placed')
+# placed_rectangles4, insertion_order = brute_force_with_rotation(rectangles, W, H)
+# print('Brute force with rotation')
+# print(insertion_order)
+# for rect in placed_rectangles4:
+#     if rect.x is not None and rect.y is not None:
+#         print(f'Rectangle at ({rect.x}, {rect.y}) with width {rect.width} and height {rect.height}')
+#     else:
+#         print(f'Rectangle with width {rect.width} and height {rect.height} could not be placed')
