@@ -163,3 +163,5 @@ class Formulaire(Frame):
         except ValueError as e:
             messagebox.showerror("Invalid input", "Please insert container")
         
+    def reset(self):
+        self.rect_indice = 1

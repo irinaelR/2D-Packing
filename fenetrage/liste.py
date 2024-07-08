@@ -8,10 +8,15 @@ class Liste(tk.Frame):
     WIDTH = 300
     HEIGHT = 400
     
-    def __init__(self, master, **kwargs) -> None:
+    def __init__(self, master, reset_rectangles, reset=None, **kwargs) -> None:
         super().__init__(master, **kwargs)
         
-        self._treeview = ttk.Treeview(self, columns = ('number', 'width', 'height'), show='headings', height=26)
+        self.reset_rectangles = reset_rectangles
+        self.reset_index = reset
+        
+        self._treeview = ttk.Treeview(self, columns = ('number', 'width', 'height'), show='headings', height=24)
+        
+        self.reset = tk.Button(self, text="RESET", command=self.reset_rect)
         
         self._rectangles: list[Rectangle] = []
         
@@ -37,7 +42,8 @@ class Liste(tk.Frame):
         self.treeview.heading('width', text='Width')
         self.treeview.column('height', anchor='center', stretch='no', width=100)
         self.treeview.heading('height', text='Height')
-        self.treeview.place(relx=0.5, rely=0.5, anchor='center')
+        self.treeview.grid(row=0)
+        self.reset.grid(row=1, pady=10)
         
     def add_rectangle(self, rect: Rectangle) -> None:
         self.rectangles.append(rect)
@@ -49,3 +55,11 @@ class Liste(tk.Frame):
 
         for rect in self.rectangles:
             self.treeview.insert("", "end", values=(rect.index, rect.width, rect.height))
+            
+    def reset_rect(self):
+        self.reset_rectangles()
+        self.reset_index()
+        self.rectangles = []
+        
+        for element in self.treeview.get_children():
+            self.treeview.delete(element)

@@ -56,4 +56,10 @@ class Conteneur(Frame):
         
         rect_temp[:] = self.rectangles
         rect_fitted_temp[:] = self.rectangles_fitted
+        
+    def reset_rectangles(self):
+        for rect in self.rectangles_fitted:
+            rect.undraw(self.canvas)
             
+        self.rectangles_fitted = []
+        self.rectangles = []

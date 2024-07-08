@@ -6,7 +6,7 @@ class Statistique(Frame):
     
     def __init__(self, master, **kwargs) -> None:
         super().__init__(master, **kwargs)
-        
+                
         self.conteneur: tuple = None
         self.rectangles: list[Rectangle] = None
         self.rectangles_fitted: list[Rectangle] = None
@@ -68,6 +68,3 @@ class Statistique(Frame):
         
         self.rect_given.config(text=f"{len(self.rectangles)}")
         self.rect_inserted.config(text=f"{len(self.rectangles_fitted)}")
-        
-        
-    

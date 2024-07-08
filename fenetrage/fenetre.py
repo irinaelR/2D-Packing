@@ -24,10 +24,12 @@ class Fenetre(Tk):
         self.geometry("{}x{}+{}+{}".format(self.WIDTH, self.HEIGHT, x_cordinate, y_cordinate))        
         
         conteneur = Conteneur(self, bg = '#dbdbdb', width=900, height=550)
-        liste = Liste(self, width=300, height=550)
         statistique = Statistique(self, width=300, height=100)
         
+        liste = Liste(self, conteneur.reset_rectangles, width=300, height=550)
         formulaire = Formulaire(self, conteneur.create_canvas, conteneur.add_rectangle, liste.add_rectangle, conteneur.choose_fit, statistique.define_conteneur, statistique.define_rect, width=900, height=100)
+        liste.reset_index = formulaire.reset
+        
         formulaire.initialize()
         formulaire.place(x=0, y=0)
         
