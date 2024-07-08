@@ -107,13 +107,13 @@ class Rectangle:
     
     def side_ok(self, other_rectangles) -> bool:
         for rect in other_rectangles:
-            if (rect.x == self.x + self.width or rect.x == self.x - rect.width) and rect.y == self.y:
+            if (rect.x == self.x + self.width or rect.x == self.x - rect.width):
                 return False
         return True
     
     def bottom_ok(self, other_rectangles) -> bool:
         for rect in other_rectangles:
-            if rect.x == self.x and rect.y == self.y + self.height:
+            if rect.y == self.y + self.height:
                 return False
         return True
     
@@ -137,9 +137,9 @@ class Rectangle:
         
         return True
     
-    def has_intersection_in_list(self, rectangles) -> bool:
+    def intersection_in_list(self, rectangles):
         for rectangle in rectangles:
             if rectangle.is_placed() and Rectangle.rectangles_intersect(self, rectangle):
-                return True
+                return rectangle
             
-        return False
+        return None
