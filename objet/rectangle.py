@@ -100,7 +100,7 @@ class Rectangle:
                 return (self.x - new_rect.width >= 0)
     
     def can_fit_under(self, new_rect, W, H) -> bool:
-        return (self.x + new_rect.width <= W and self.y + self.height + new_rect.height <= H)
+        return (self.y + self.height + new_rect.height <= H)
     
     def can_fit_above(self, new_rect, W, H) -> bool:
         return (self.x + new_rect.width <= H and self.y - new_rect.height <= H)
