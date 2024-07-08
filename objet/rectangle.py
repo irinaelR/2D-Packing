@@ -92,21 +92,34 @@ class Rectangle:
             canvas.delete(self.text_id)
             self.text_id = None
 
-    def can_fit_on_side(self, new_rect, W, H) -> bool:
-        return (self.x + self.width + new_rect.width <= W and self.y + new_rect.height <= H)
+    def can_fit_on_side(self, new_rect, W, H, side) -> bool:
+        match side:
+            case "right":
+                return (self.x + self.width + new_rect.width <= W)
+            case "left":
+                return (self.x - new_rect.width >= 0)
     
     def can_fit_under(self, new_rect, W, H) -> bool:
         return (self.x + new_rect.width <= W and self.y + self.height + new_rect.height <= H)
     
+    def can_fit_above(self, new_rect, W, H) -> bool:
+        return (self.x + new_rect.width <= H and self.y - new_rect.height <= H)
+    
     def side_ok(self, other_rectangles) -> bool:
         for rect in other_rectangles:
-            if rect.x == self.x + self.width and rect.y == self.y:
+            if (rect.x == self.x + self.width or rect.x == self.x - rect.width) and rect.y == self.y:
                 return False
         return True
     
     def bottom_ok(self, other_rectangles) -> bool:
         for rect in other_rectangles:
             if rect.x == self.x and rect.y == self.y + self.height:
+                return False
+        return True
+    
+    def top_ok(self, other_rectangles) -> bool:
+        for rect in other_rectangles:
+            if rect.x == self.x and rect.y == self.y - rect.height:
                 return False
         return True
     

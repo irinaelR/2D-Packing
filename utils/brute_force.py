@@ -2,6 +2,7 @@ import itertools
 
 def brute_force(rectangles, W, H):
     rectangles = [rect for rect in rectangles if rect.width <= W and rect.height <= H]
+    rectangles.sort(key=lambda r: r.height, reverse=True)
 
     for rect in rectangles:
         rect.x = None
@@ -9,7 +10,7 @@ def brute_force(rectangles, W, H):
 
     placed_rectangles = []
     max_placed_rectangles = 0
-    # insertion_order = None
+    # insertion_order = None 
 
     for permutation in itertools.permutations(rectangles):
         temp_layout = []
@@ -24,24 +25,38 @@ def brute_force(rectangles, W, H):
                 count_placed += 1
             else:
                 added = False
-                next_y = -1
+                lowest_rectangle = max(actual_layout, key=lambda rect: rect.y)
+                next_y = lowest_rectangle.y + lowest_rectangle.height
+
                 round = 1
-                while round <= 2 and added is False:
+                while round <= 3 and added is False:
                     for placed_rect in actual_layout:
                         if round == 1 and placed_rect.y + placed_rect.height > next_y:
                             next_y = placed_rect.y + placed_rect.height
 
-                        if round == 1 and placed_rect.side_ok(actual_layout) and placed_rect.can_fit_on_side(rectangle, W, H):
+                        if round == 1 and placed_rect.side_ok(actual_layout) and placed_rect.can_fit_on_side(rectangle, W, H, "right"):
                             rectangle.x = placed_rect.x + placed_rect.width
-                            rectangle.y = placed_rect.y
+                            for temp_y in range(H+1):
+                                rectangle.y = temp_y
+                                # if the rectangle can be placed next to placed_rect WITHOUT overlapping any other
+                                if not rectangle.has_intersection_in_list(temp_layout):
+                                    count_placed += 1
+                                    added = True
+                                    break
+                            if added:
+                                break
 
-                            # if the rectangle can be placed next to placed_rect WITHOUT overlapping any other
+                        elif round == 2 and placed_rect.y + placed_rect.height + rectangle.height <= H:
+                            rectangle.x = 0
+                            rectangle.y = placed_rect.y + placed_rect.height
+
+                            # if the rectangle can be placed next to rect_in_list WITHOUT overlapping any other
                             if not rectangle.has_intersection_in_list(temp_layout):
                                 count_placed += 1
                                 added = True
                                 break
 
-                        elif round == 2 and placed_rect.bottom_ok(actual_layout) and placed_rect.can_fit_under(rectangle, W, H):
+                        elif round == 3 and placed_rect.bottom_ok(actual_layout) and placed_rect.can_fit_under(rectangle, W, H):
                             rectangle.x = placed_rect.x
                             rectangle.y = placed_rect.y + placed_rect.height
 
@@ -54,7 +69,7 @@ def brute_force(rectangles, W, H):
                     round += 1
                 
                 if not added:
-                    if next_y + rectangle.height <= H and rectangle.width <= W:
+                    if next_y + rectangle.height <= H:
                         rectangle.x = 0
                         rectangle.y = next_y
                         count_placed += 1
