@@ -1,7 +1,7 @@
-import math;
-from Forms import Cercle;
-from Forms import Rectangle;
-from Forms import TriangleIsocele;
+import math
+from Forms import Cercle
+from Forms import Rectangle
+from Forms import TriangleIsocele
 
 def best_fit_heuristic(shapes, W, H):
     free_spaces = [(0, 0, W, H)]
@@ -21,24 +21,30 @@ def best_fit_heuristic(shapes, W, H):
                         best_space = space
 
             elif isinstance(shape, Rectangle):
+                original_width = shape.width
+                original_height = shape.height
                 for rot in [0, 90]:
                     if rot == 90:
-                        shape.width, shape.height = shape.height, shape.width
+                        shape.width, shape.height = original_height, original_width
                     if shape.width <= sw and shape.height <= sh:
                         waste = (sw - shape.width) * (sh - shape.height)
                         if waste < min_waste:
                             min_waste = waste
                             best_space = space
+                shape.width, shape.height = original_width, original_height
 
             elif isinstance(shape, TriangleIsocele):
+                original_base = shape.base
+                original_height = shape.height
                 for rot in [0, 90]:
                     if rot == 90:
-                        shape.base, shape.height = shape.height, shape.base
+                        shape.base, shape.height = original_height, original_base
                     if shape.base <= sw and shape.height <= sh:
                         waste = (sw - shape.base) * (sh - shape.height)
                         if waste < min_waste:
                             min_waste = waste
                             best_space = space
+                shape.base, shape.height = original_base, original_height
 
         if best_space:
             sx, sy, sw, sh = best_space
@@ -69,11 +75,12 @@ def best_fit_heuristic(shapes, W, H):
     return shapes
 
 shapes = [
-    Cercle(3), 
-    Rectangle(2, 4), 
-    TriangleIsocele(3, 2)
+    Rectangle(6, 1), 
+    Rectangle(1, 6), 
+    Cercle(1), 
+    TriangleIsocele(2, 1)
 ]
-W, H = 8, 10
+W, H = 8, 8
 placed_shapes = best_fit_heuristic(shapes, W, H)
 
 for shape in placed_shapes:
@@ -86,9 +93,3 @@ for shape in placed_shapes:
             print(f'Triangle at ({shape.x}, {shape.y}) with base {shape.base} and height {shape.height}')
     else:
         print(f'Shape could not be placed')
-
-
-# Exemples de données donnant une solution non optimale
-        '''
-            
-        '''
