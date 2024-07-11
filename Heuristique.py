@@ -36,9 +36,9 @@ def best_fit_heuristic(shapes, W, H):
             elif isinstance(shape, TriangleIsocele):
                 original_base = shape.base
                 original_height = shape.height
-                for rot in [0, 90]:
-                    if rot == 90:
-                        shape.base, shape.height = original_height, original_base
+                for rot in [0, 90, 180]:
+                    if rot == 90 or rot == 180:
+                        shape.base, shape.height = shape.height, shape.base
                     if shape.base <= sw and shape.height <= sh:
                         waste = (sw - shape.base) * (sh - shape.height)
                         if waste < min_waste:
@@ -62,8 +62,8 @@ def best_fit_heuristic(shapes, W, H):
 
             free_spaces.remove(best_space)
             new_spaces = [
-                (sx + used_width, sy, sw - used_width, used_height),
-                (sx, sy + used_height, sw, sh - used_height)
+                (sx + used_width, sy, sw - used_width, used_height),  # Right
+                (sx, sy + used_height, sw, sh - used_height)  # Top
             ]
             valid_new_spaces = []
             for new_space in new_spaces:
@@ -75,12 +75,11 @@ def best_fit_heuristic(shapes, W, H):
     return shapes
 
 shapes = [
-    Rectangle(6, 1), 
-    Rectangle(1, 6), 
-    Cercle(1), 
-    TriangleIsocele(2, 1)
+    Rectangle(3, 2), 
+    TriangleIsocele(3, 2),
+    Cercle(1) 
 ]
-W, H = 8, 8
+W, H = 6, 6
 placed_shapes = best_fit_heuristic(shapes, W, H)
 
 for shape in placed_shapes:
