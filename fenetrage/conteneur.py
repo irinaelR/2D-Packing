@@ -1,7 +1,7 @@
 from tkinter import * # type: ignore
 
 from utils.utilitaire import Utilitaire
-from objet.rectangle import Rectangle
+from objet.forme import Forme
 
 class Conteneur(Frame):
     
@@ -11,9 +11,9 @@ class Conteneur(Frame):
         self.canvas_width: int = None
         self.canvas_height: int = None
         
-        self._rectangles: list[Rectangle] = []
+        self._formes: list[Forme] = []
         
-        self.rectangles_fitted: list[Rectangle] = []
+        self.formes_fitted: list[Forme] = []
         
         self.fit_chosen: str = None
         
@@ -23,15 +23,15 @@ class Conteneur(Frame):
     def _set_canvas(self, canvas: Canvas) -> None:
         self._canvas = canvas
         
-    def _get_rectangles(self) -> list[Rectangle]:
-        return self._rectangles
+    def _get_formes(self) -> list[Forme]:
+        return self._formes
     
-    def _set_rectangles(self, rectangles: list[Rectangle]) -> None:
-        self._rectangles = rectangles
+    def _set_formes(self, formes: list[Forme]) -> None:
+        self._formes = formes
         
         
     canvas: Canvas = property(_get_canvas, _set_canvas)
-    rectangles: list[Rectangle] = property(_get_rectangles, _set_rectangles)
+    formes: list[Forme] = property(_get_formes, _set_formes)
         
     def create_canvas(self, W, H):
         for widget in self.winfo_children():
@@ -40,26 +40,26 @@ class Conteneur(Frame):
         self.canvas = Canvas(self, width=W, height=H, bg="white", highlightthickness=0)
         self.canvas.place(relx=0.5, rely=0.5, anchor="center")
         
-    def add_rectangle(self, rect: Rectangle):
-        self.rectangles.append(rect)
+    def add_forme(self, rect: Forme):
+        self.formes.append(rect)
         
-    def choose_fit(self, fit, rect_temp, rect_fitted_temp):
-        for rect in self.rectangles_fitted:
-            rect.undraw(self.canvas)
+    def choose_fit(self, fit, form_temp, form_fitted_temp):
+        for form in self.formes_fitted:
+            form.undraw(self.canvas)
             
         self.fit_chosen = fit
-        self.rectangles_fitted = Utilitaire.choose_fit(self.fit_chosen, self.rectangles, int(self.canvas.cget('width')), int(self.canvas.cget('height')))
-        print(f"Longueur de fitted {self.rectangles_fitted}")
+        self.formes_fitted = Utilitaire.choose_fit(self.fit_chosen, self.formes, int(self.canvas.cget('width')), int(self.canvas.cget('height')))
+        print(f"Longueur de fitted {self.formes_fitted}")
         
-        for rect in self.rectangles_fitted:
-            rect.draw(self.canvas)
+        for form in self.formes_fitted:
+            form.draw(self.canvas)
         
-        rect_temp[:] = self.rectangles
-        rect_fitted_temp[:] = self.rectangles_fitted
+        form_temp[:] = self.formes
+        form_fitted_temp[:] = self.formes_fitted
         
-    def reset_rectangles(self):
-        for rect in self.rectangles_fitted:
-            rect.undraw(self.canvas)
+    def reset_formes(self):
+        for form in self.formes_fitted:
+            form.undraw(self.canvas)
             
-        self.rectangles_fitted = []
-        self.rectangles = []
+        self.formes_fitted = []
+        self.formes = []

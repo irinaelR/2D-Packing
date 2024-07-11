@@ -1,6 +1,6 @@
 from tkinter import * # type: ignore
 
-from objet.rectangle import Rectangle
+from objet.forme import Forme
 
 class Statistique(Frame):
     
@@ -8,8 +8,8 @@ class Statistique(Frame):
         super().__init__(master, **kwargs)
                 
         self.conteneur: tuple = None
-        self.rectangles: list[Rectangle] = None
-        self.rectangles_fitted: list[Rectangle] = None
+        self.formes: list[Forme] = None
+        self.formes_fitted: list[Forme] = None
         
         self.surface_totale_label = Label(self, text="Surface totale:")
         self.surface_totale = Label(self)
@@ -20,11 +20,11 @@ class Statistique(Frame):
         self.surface_restante_label = Label(self, text="Surface restante:")
         self.surface_restante = Label(self)
         
-        self.rect_given_label = Label(self, text="Rectangles donnés:")
-        self.rect_given = Label(self)
+        self.form_given_label = Label(self, text="Formes donnés:")
+        self.form_given = Label(self)
         
-        self.rect_inserted_label = Label(self, text="Rectangles inserés:")
-        self.rect_inserted = Label(self)
+        self.form_inserted_label = Label(self, text="Formes inserés:")
+        self.form_inserted = Label(self)
         
         
     def initialize(self) -> None:
@@ -37,34 +37,34 @@ class Statistique(Frame):
         self.surface_restante_label.grid(row=2, column=0, columnspan=2, padx=10, pady=2, sticky="w")
         self.surface_restante.grid(row=2, column=1, columnspan=2, padx=10, pady=2)
         
-        self.rect_given_label.grid(row=3, column=0, padx=10, pady=3)
-        self.rect_given.grid(row=3, column=1)
+        self.form_given_label.grid(row=3, column=0, padx=10, pady=3)
+        self.form_given.grid(row=3, column=1)
         
-        self.rect_inserted_label.grid(row=3, column=2, padx=10, pady=3)
-        self.rect_inserted.grid(row=3, column=4)
+        self.form_inserted_label.grid(row=3, column=2, padx=10, pady=3)
+        self.form_inserted.grid(row=3, column=4)
         
     def define_conteneur(self, width, height) -> None:
         self.conteneur = (width, height)
         surface_totale = self.conteneur[0] * self.conteneur[1]
         self.surface_totale.config(text=f"{surface_totale:,}")
         
-    def calcul_surface_rect(self, rect: list[Rectangle]):
+    def calcul_surface_form(self, form: list[Forme]):
         value = 0
-        for rectangle in rect:
-            temp = rectangle.width * rectangle.height
+        for formangle in form:
+            temp = formangle.width * formangle.height
             value += temp
         return value
         
-    def define_rect(self, rect, rect_fitted):
-        self.rectangles = rect
-        self.rectangles_fitted = rect_fitted
+    def define_form(self, form, form_fitted):
+        self.formes = form
+        self.formes_fitted = form_fitted
 
-        occupee = self.calcul_surface_rect(self.rectangles_fitted)
+        occupee = self.calcul_surface_form(self.formes_fitted)
         self.surface_occupee.config(text=f"{occupee:,}")
         
         surface_totale = self.conteneur[0] * self.conteneur[1]
         restante = surface_totale - occupee
         self.surface_restante.config(text=f"{restante:,}")
         
-        self.rect_given.config(text=f"{len(self.rectangles)}")
-        self.rect_inserted.config(text=f"{len(self.rectangles_fitted)}")
+        self.form_given.config(text=f"{len(self.formes)}")
+        self.form_inserted.config(text=f"{len(self.formes_fitted)}")
