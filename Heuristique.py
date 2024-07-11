@@ -1,4 +1,6 @@
-import math
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+
 from Forms import Cercle
 from Forms import Rectangle
 from Forms import TriangleIsocele
@@ -74,9 +76,29 @@ def best_fit_heuristic(shapes, W, H):
 
     return shapes
 
+def plot_shapes(placed_shapes, W, H):
+    fig, ax = plt.subplots()
+    ax.set_xlim(0, W)
+    ax.set_ylim(0, H)
+
+    for shape in placed_shapes:
+        if isinstance(shape, Cercle):
+            circle = patches.Circle((shape.x + shape.rayon, shape.y + shape.rayon), shape.rayon, edgecolor='black', facecolor='blue', alpha=0.5)
+            ax.add_patch(circle)
+        elif isinstance(shape, Rectangle):
+            rect = patches.Rectangle((shape.x, shape.y), shape.width, shape.height, edgecolor='black', facecolor='green', alpha=0.5)
+            ax.add_patch(rect)
+        elif isinstance(shape, TriangleIsocele):
+            triangle = patches.Polygon([(shape.x, shape.y), (shape.x + shape.base, shape.y), (shape.x + shape.base / 2, shape.y + shape.height)], edgecolor='black', facecolor='red', alpha=0.5)
+            ax.add_patch(triangle)
+
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.show()
+
 shapes = [
-    Rectangle(3, 2), 
+    Rectangle(5, 2), 
     TriangleIsocele(3, 2),
+    Rectangle(3, 2), 
     Cercle(1) 
 ]
 W, H = 6, 6
@@ -92,3 +114,5 @@ for shape in placed_shapes:
             print(f'Triangle at ({shape.x}, {shape.y}) with base {shape.base} and height {shape.height}')
     else:
         print(f'Shape could not be placed')
+
+plot_shapes(placed_shapes, W, H)

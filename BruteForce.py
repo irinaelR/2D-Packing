@@ -1,4 +1,7 @@
 import itertools
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+
 from Forms import Cercle, Rectangle, TriangleIsocele
 
 def generate_rotations(shape):
@@ -13,88 +16,20 @@ def generate_rotations(shape):
         return [
             TriangleIsocele(shape.base, shape.height),
             TriangleIsocele(shape.height, shape.base),
-            TriangleIsocele(shape.base, shape.height)  # Rotation de 180 degrés est la même que 0 degrés
+            TriangleIsocele(shape.base, shape.height)
         ]
-
-def can_place(shape, x, y, W, H, placed_shapes):
-    if isinstance(shape, Cercle):
-        if x + 2 * shape.rayon > W or y + 2 * shape.rayon > H:
-            return False
-        for other in placed_shapes:
-            if isinstance(other, Cercle):
-                if ((x - other.x) ** 2 + (y - other.y) ** 2) ** 0.5 < shape.rayon + other.rayon:
-                    return False
-            elif isinstance(other, Rectangle):
-                if not (x >= other.x + other.width or
-                        x + 2 * shape.rayon <= other.x or
-                        y >= other.y + other.height or
-                        y + 2 * shape.rayon <= other.y):
-                    return False
-            elif isinstance(other, TriangleIsocele):
-                if not (x >= other.x + other.base or
-                        x + 2 * shape.rayon <= other.x or
-                        y >= other.y + other.height or
-                        y + 2 * shape.rayon <= other.y):
-                    return False
-        return True
-    elif isinstance(shape, Rectangle):
-        if x + shape.width > W or y + shape.height > H:
-            return False
-        for other in placed_shapes:
-            if isinstance(other, Cercle):
-                if not (x >= other.x + 2 * other.rayon or
-                        x + shape.width <= other.x or
-                        y >= other.y + 2 * other.rayon or
-                        y + shape.height <= other.y):
-                    return False
-            elif isinstance(other, Rectangle):
-                if not (x >= other.x + other.width or
-                        x + shape.width <= other.x or
-                        y >= other.y + other.height or
-                        y + shape.height <= other.y):
-                    return False
-            elif isinstance(other, TriangleIsocele):
-                if not (x >= other.x + other.base or
-                        x + shape.width <= other.x or
-                        y >= other.y + other.height or
-                        y + shape.height <= other.y):
-                    return False
-        return True
-    elif isinstance(shape, TriangleIsocele):
-        if x + shape.base > W or y + shape.height > H:
-            return False
-        for other in placed_shapes:
-            if isinstance(other, Cercle):
-                if not (x >= other.x + 2 * other.rayon or
-                        x + shape.base <= other.x or
-                        y >= other.y + 2 * other.rayon or
-                        y + shape.height <= other.y):
-                    return False
-            elif isinstance(other, Rectangle):
-                if not (x >= other.x + other.width or
-                        x + shape.base <= other.x or
-                        y >= other.y + other.height or
-                        y + shape.height <= other.y):
-                    return False
-            elif isinstance(other, TriangleIsocele):
-                if not (x >= other.x + other.base or
-                        x + shape.base <= other.x or
-                        y >= other.y + other.height or
-                        y + shape.height <= other.y):
-                    return False
-        return True
 
 def brute_force_packing(shapes, W, H):
     best_placement = None
     min_bins = float('inf')
 
     rotations = [generate_rotations(shape) for shape in shapes]
-    all_rotations_combinations = list(itertools.product(*rotations))
+    all_rotations_combinations = itertools.product(*rotations)
     
     for rotation_comb in all_rotations_combinations:
         placements = []
 
-        def place_shape(i, current_placements):
+        def place_shape(i, current_placements, free_spaces):
             nonlocal best_placement, min_bins
             if i == len(rotation_comb):
                 if len(current_placements) < min_bins:
@@ -103,26 +38,119 @@ def brute_force_packing(shapes, W, H):
                 return
             
             shape = rotation_comb[i]
-            for x in range(W):
-                for y in range(H):
-                    if can_place(shape, x, y, W, H, current_placements):
-                        shape.x, shape.y = x, y
-                        current_placements.append(shape)
-                        place_shape(i + 1, current_placements)
-                        current_placements.pop()
+            placed = False
+            for space in free_spaces:
+                sx, sy, sw, sh = space
+                if best_space_for_shape(shape, space):
+                    shape.x, shape.y = sx, sy
+                    current_placements.append(shape)
+                    
+                    # Mise à jour des espaces libres
+                    new_free_spaces = []
+                    for fsx, fsy, fsw, fsh in free_spaces:
+                        if isinstance(shape, Cercle):
+                            used_width = 2 * shape.rayon
+                            used_height = 2 * shape.rayon
+                        elif isinstance(shape, Rectangle):
+                            used_width = shape.width
+                            used_height = shape.height
+                        elif isinstance(shape, TriangleIsocele):
+                            if shape.rotation == 0 or shape.rotation == 180:
+                                used_width = shape.base
+                                used_height = shape.height
+                            else:
+                                used_width = shape.height
+                                used_height = shape.base
+
+                        new_spaces = [
+                            (fsx + used_width, fsy, fsw - used_width, fsh),  # Droite
+                            (fsx, fsy + used_height, fsw, fsh - used_height)  # Haut
+                        ]
+                        for nsx, nsy, nsw, nsh in new_spaces:
+                            if nsw > 0 and nsh > 0:
+                                new_free_spaces.append((nsx, nsy, nsw, nsh))
+                    
+                    place_shape(i + 1, current_placements, new_free_spaces)
+                    
+                    # Retour en arrière pour essayer d'autres placements
+                    current_placements.pop()
+                    placed = True
+                    break
+            
+            if not placed:
+                # Si la forme n'a pas pu être placée dans aucun espace libre
+                return
         
-        place_shape(0, placements)
+        # Initialiser avec le grand espace rectangulaire
+        free_spaces = [(0, 0, W, H)]
+        place_shape(0, placements, free_spaces)
     
     return best_placement
 
+def best_space_for_shape(shape, space):
+    sx, sy, sw, sh = space
+
+    # Vérification pour Cercle
+    if isinstance(shape, Cercle):
+        if 2 * shape.rayon <= sw and 2 * shape.rayon <= sh:
+            return True
+
+    # Vérification pour Rectangle
+    elif isinstance(shape, Rectangle):
+        original_width = shape.width
+        original_height = shape.height
+        for rot in [0, 90]:
+            if rot == 90:
+                shape.width, shape.height = original_height, original_width
+            if shape.width <= sw and shape.height <= sh:
+                return True
+        # Réinitialiser les dimensions originales
+        shape.width, shape.height = original_width, original_height
+
+    # Vérification pour Triangle
+    elif isinstance(shape, TriangleIsocele):
+        original_base = shape.base
+        original_height = shape.height
+        for rot in [0, 90, 180]:
+            if rot == 90 or rot == 180:
+                shape.base, shape.height = shape.height, shape.base
+            if shape.base <= sw and shape.height <= sh:
+                return True
+        # Réinitialiser les dimensions originales
+        shape.base, shape.height = original_base, original_height
+    
+    return False
+
+def plot_shapes(placed_shapes, W, H):
+    fig, ax = plt.subplots()
+    ax.set_xlim(0, W)
+    ax.set_ylim(0, H)
+
+    for shape in placed_shapes:
+        if isinstance(shape, Cercle):
+            circle = patches.Circle((shape.x + shape.rayon, shape.y + shape.rayon), shape.rayon, edgecolor='black', facecolor='blue', alpha=0.5)
+            ax.add_patch(circle)
+        elif isinstance(shape, Rectangle):
+            rect = patches.Rectangle((shape.x, shape.y), shape.width, shape.height, edgecolor='black', facecolor='green', alpha=0.5)
+            ax.add_patch(rect)
+        elif isinstance(shape, TriangleIsocele):
+            triangle = patches.Polygon([(shape.x, shape.y), (shape.x + shape.base, shape.y), (shape.x + shape.base / 2, shape.y + shape.height)], edgecolor='black', facecolor='red', alpha=0.5)
+            ax.add_patch(triangle)
+
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.show()
+
+# Exemple d'utilisation
 shapes = [
-    Rectangle(3, 2), 
+    Cercle(1),
     TriangleIsocele(3, 2),
-    Cercle(1) 
+    Rectangle(4, 2),
+    Rectangle(3, 2) 
 ]
 W, H = 6, 6
 placed_shapes = brute_force_packing(shapes, W, H)
 
+# Afficher les résultats
 for shape in placed_shapes:
     if isinstance(shape, Cercle):
         print(f'Cercle at ({shape.x}, {shape.y}) with radius {shape.rayon}')
@@ -130,3 +158,5 @@ for shape in placed_shapes:
         print(f'Rectangle at ({shape.x}, {shape.y}) with width {shape.width} and height {shape.height}')
     elif isinstance(shape, TriangleIsocele):
         print(f'Triangle at ({shape.x}, {shape.y}) with base {shape.base} and height {shape.height}')
+
+plot_shapes(placed_shapes, W, H)
