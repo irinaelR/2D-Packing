@@ -45,7 +45,6 @@ def brute_force_packing(shapes, W, H):
                     shape.x, shape.y = sx, sy
                     current_placements.append(shape)
                     
-                    # Mise à jour des espaces libres
                     new_free_spaces = []
                     for fsx, fsy, fsw, fsh in free_spaces:
                         if isinstance(shape, Cercle):
@@ -72,16 +71,13 @@ def brute_force_packing(shapes, W, H):
                     
                     place_shape(i + 1, current_placements, new_free_spaces)
                     
-                    # Retour en arrière pour essayer d'autres placements
                     current_placements.pop()
                     placed = True
                     break
             
             if not placed:
-                # Si la forme n'a pas pu être placée dans aucun espace libre
                 return
         
-        # Initialiser avec le grand espace rectangulaire
         free_spaces = [(0, 0, W, H)]
         place_shape(0, placements, free_spaces)
     
@@ -90,12 +86,10 @@ def brute_force_packing(shapes, W, H):
 def best_space_for_shape(shape, space):
     sx, sy, sw, sh = space
 
-    # Vérification pour Cercle
     if isinstance(shape, Cercle):
         if 2 * shape.rayon <= sw and 2 * shape.rayon <= sh:
             return True
 
-    # Vérification pour Rectangle
     elif isinstance(shape, Rectangle):
         original_width = shape.width
         original_height = shape.height
@@ -104,10 +98,8 @@ def best_space_for_shape(shape, space):
                 shape.width, shape.height = original_height, original_width
             if shape.width <= sw and shape.height <= sh:
                 return True
-        # Réinitialiser les dimensions originales
         shape.width, shape.height = original_width, original_height
 
-    # Vérification pour Triangle
     elif isinstance(shape, TriangleIsocele):
         original_base = shape.base
         original_height = shape.height
@@ -116,7 +108,6 @@ def best_space_for_shape(shape, space):
                 shape.base, shape.height = shape.height, shape.base
             if shape.base <= sw and shape.height <= sh:
                 return True
-        # Réinitialiser les dimensions originales
         shape.base, shape.height = original_base, original_height
     
     return False
@@ -140,17 +131,15 @@ def plot_shapes(placed_shapes, W, H):
     plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
 
-# Exemple d'utilisation
 shapes = [
     Cercle(1),
-    TriangleIsocele(3, 2),
     Rectangle(4, 2),
+    TriangleIsocele(3, 2),
     Rectangle(3, 2) 
 ]
 W, H = 6, 6
 placed_shapes = brute_force_packing(shapes, W, H)
 
-# Afficher les résultats
 for shape in placed_shapes:
     if isinstance(shape, Cercle):
         print(f'Cercle at ({shape.x}, {shape.y}) with radius {shape.rayon}')
