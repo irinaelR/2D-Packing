@@ -17,7 +17,7 @@ class Rectangle:
         return f"Rectangle[x={self.x}, y={self.y}, w={self.width}, h={self.height}]"
     
     def __repr__(self) -> str:
-        return f"Rectangle[w={self.width}, h={self.height}]"
+        return f"Rectangle[index={self.index}, w={self.width}, h={self.height}, x={self.x}, y={self.y}]"
         
     def _get_index(self) -> int:
         return self._index
@@ -92,6 +92,9 @@ class Rectangle:
             canvas.delete(self.text_id)
             self.text_id = None
 
+    def rotate(self):
+        return Rectangle(self.index, self.width, self.height)
+
     def can_fit_on_side(self, new_rect, W, H, side) -> bool:
         match side:
             case "right":
@@ -107,15 +110,21 @@ class Rectangle:
     
     def side_ok(self, other_rectangles) -> bool:
         for rect in other_rectangles:
-            if (rect.x == self.x + self.width or rect.x == self.x - rect.width):
+            if rect.y == self.y and rect.x == self.x + self.width:
                 return False
         return True
     
     def bottom_ok(self, other_rectangles) -> bool:
+        occupied_width = 0
         for rect in other_rectangles:
             if rect.y == self.y + self.height:
-                return False
-        return True
+                if rect.x <= self.x < (rect.x+rect.width):
+                    occupied_width += rect.x + rect.width - self.x
+                elif self.x <= rect.x < (self.x+self.width) and rect.x+rect.width <= self.x + self.width:
+                    occupied_width += rect.width
+                elif self.x <= rect.x < (self.x+self.width) and rect.x+rect.width > self.x + self.width:
+                    occupied_width += self.x + self.width - rect.x
+        return (occupied_width < self.width)
     
     def top_ok(self, other_rectangles) -> bool:
         for rect in other_rectangles:
@@ -127,19 +136,36 @@ class Rectangle:
         return self.x != None and self.y != None
     
     def rectangles_intersect(rect1, rect2):
-        # Check if one rectangle is to the left of the other
-        if rect1.x + rect1.width <= rect2.x or rect2.x + rect2.width <= rect1.x:
-            return False
+        # # Check if one rectangle is to the left of the other
+        # if rect1.x + rect1.width <= rect2.x or rect2.x + rect2.width <= rect1.x:
+        #     return False
         
-        # Check if one rectangle is above the other
-        if rect1.y + rect1.height <= rect2.y or rect2.y + rect2.height <= rect1.y:
-            return False
+        # # Check if one rectangle is above the other
+        # if rect1.y + rect1.height <= rect2.y or rect2.y + rect2.height <= rect1.y:
+        #     return False
         
-        return True
+        # return True
+        if rect1.width == rect2.width and rect1.height == rect2.height and rect1.x == rect2.x and rect1.y == rect2.y:
+            return True
+        
+        # elif rect1.x <= rect2.x < rect1.x + rect1.width or rect1.y <= rect2.y < rect1.y + rect1.height:
+        #     return True
+        # else:
+        #     return False
+        rectangle_points = [(rect1.x, rect1.y), (rect1.x + rect1.width, rect1.y), (rect1.x, rect1.y + rect1.height), (rect1.x + rect1.width, rect1.y + rect1.height), (rect1.x + int(rect1.width/2), rect1.y), (rect1.x + int(rect1.width/2), rect1.y + rect1.height), (rect1.x, rect1.y + int(rect1.height / 2)), (rect1.x + rect1.width, rect1.y + int(rect1.height / 2))]
+        for point in rectangle_points:
+            # if (rect2.x < point[0] < rect2.x + rect2.width and rect2.y <= point[1] < rect2.y + rect2.height) or (rect2.x <= point[0] < rect2.x + rect2.width and rect2.y < point[1] < rect2.y + rect2.height):
+            #     return True
+            if rect2.x < point[0] < rect2.x + rect2.width and rect2.y < point[1] < rect2.y + rect2.height:
+                return True
+        return False
+        
     
     def intersection_in_list(self, rectangles):
         for rectangle in rectangles:
-            if rectangle.is_placed() and Rectangle.rectangles_intersect(self, rectangle):
+            if self.index == rectangle.index:
+                continue
+            if rectangle.is_placed() and (Rectangle.rectangles_intersect(self, rectangle) or Rectangle.rectangles_intersect(rectangle, self)):
                 return rectangle
             
         return None
