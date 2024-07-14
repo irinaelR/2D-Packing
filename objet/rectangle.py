@@ -75,6 +75,35 @@ class Rectangle:
     canvas_id = property(_get_canvas_id, _set_canvas_id)
     text_id = property(_get_text_id, _set_text_id)
     color = property(_get_color, _set_color)
+
+    @property
+    def bottom(self):
+        """
+        Rectangle bottom edge y coordinate
+        """
+        return self.y
+
+    @property
+    def top(self):
+        """
+        Rectangle top edge y coordiante
+        """
+        return self.y+self.height
+
+    @property
+    def left(self):
+        """
+        Rectangle left ednge x coordinate
+        """
+        return self.x
+
+    @property
+    def right(self):
+        """
+        Rectangle right edge x coordinate
+        """
+        return self.x+self.width
+
         
     @staticmethod
     def random_color_generator():
@@ -159,13 +188,89 @@ class Rectangle:
             if rect2.x < point[0] < rect2.x + rect2.width and rect2.y < point[1] < rect2.y + rect2.height:
                 return True
         return False
+    
+    def intersects(self, rect, edges=False):
+        """
+        Detect intersections between this and another Rectangle.
+
+        Parameters:
+            rect (Rectangle): The other rectangle.
+            edges (bool): True to consider rectangles touching by their
+                edges or corners to be intersecting.
+                (Should have been named include_touching)
+
+        Returns:
+            bool: True if the rectangles intersect, False otherwise
+        """
+        if edges:
+            if (self.bottom > rect.top or self.top < rect.bottom or\
+                self.left > rect.right or self.right < rect.left):
+                return False
+        else:
+            if (self.bottom >= rect.top or self.top <= rect.bottom or
+                self.left >= rect.right or self.right <= rect.left):
+                return False
+
+        return True
+    
+    # def rectangles_intersect(rect1, rect2):
+
+    #     l1 = (rect1.x, rect1.y)
+    #     r1 = (rect1.x + rect1.width, rect1.y + rect1.height)
+    #     print(f"Rectangle 1 : [top left={l1}, bottom right={r1}]")
+
+    #     l2 = (rect2.x, rect2.y)
+    #     r2 = (rect2.x + rect2.width, rect2.y + rect2.height)
+    #     print(f"Rectangle 2 : [top left={l2}, bottom right={r2}]")
+
+    #     # if rectangle has area 0, no overlap
+    #     if l1[0] == r1[0] or l1[1] == r1[1] or r2[0] == l2[0] or l2[1] == r2[1]:
+    #         print("Area 0")
+    #         return False
+        
+        
+    #     # If one rectangle is on left side of other
+    #     if l1[0] >= r2[0] or l2[0] >= r1[0]:
+    #         print("Left")
+    #         return False
+    
+    #     # If one rectangle is above other
+    #     if r1[1] >= l2[1] or r2[1] >= l1[1]:
+    #         print("Above")
+    #         return False
+    
+    #     return True
+    
+    def bb_intersection_over_union(boxA, boxB):
+        # determine the (x, y)-coordinates of the intersection rectangle
+        xA = max(boxA.x, boxB.x)
+        yA = max(boxA.y, boxB.y)
+        xB = min(boxA.x + boxA.width, boxB.x + boxB.width)
+        yB = min(boxA.y + boxA.height, boxB.y + boxB.height)
+
+        # compute the area of intersection rectangle
+        interArea = abs(max((xB - xA, 0)) * max((yB - yA), 0))
+        if interArea == 0:
+            return 0
+        # compute the area of both the prediction and ground-truth
+        # rectangles
+        boxAArea = abs((boxA.x + boxA.width - boxA.x) * (boxA.y + boxA.height - boxA.y))
+        boxBArea = abs((boxB.x + boxB.width - boxB.x) * (boxB.y + boxB.height - boxB.y))
+
+        # compute the intersection over union by taking the intersection
+        # area and dividing it by the sum of prediction + ground-truth
+        # areas - the interesection area
+        iou = interArea / float(boxAArea + boxBArea - interArea)
+
+        # return the intersection over union value
+        return iou
         
     
     def intersection_in_list(self, rectangles):
         for rectangle in rectangles:
             if self.index == rectangle.index:
                 continue
-            if rectangle.is_placed() and (Rectangle.rectangles_intersect(self, rectangle) or Rectangle.rectangles_intersect(rectangle, self)):
+            if rectangle.is_placed() and rectangle.intersects(self):
                 return rectangle
             
         return None
