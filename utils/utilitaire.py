@@ -1,5 +1,5 @@
 from utils.best_fit import best_fit
-from utils.brute_force import brute_force
+from utils.brute_force import brute_force, brute_force_2
 from utils.brute_force_rotation import brute_force_rotation
 from utils.next_fit import next_fit_dh
 from utils.first_fit import first_fit_dh

@@ -93,9 +93,6 @@ def brute_force(rectangles, W, H):
                             current_reference = ref
                             # print(f"{current_reference} is the new reference")
                             break
-                        else:
-                            pass
-                            # print(f"{ref} could not be a reference")
 
         if len(temp_layout) == len(rectangles):
             placed_rectangles = temp_layout

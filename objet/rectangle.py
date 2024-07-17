@@ -93,7 +93,7 @@ class Rectangle:
             self.text_id = None
 
     def rotate(self):
-        return Rectangle(self.index, self.width, self.height)
+        return Rectangle(self.index, self.height, self.width)
 
     def can_fit_on_side(self, new_rect, W, H, side) -> bool:
         match side:
@@ -169,3 +169,6 @@ class Rectangle:
                 return rectangle
             
         return None
+    
+    def can_fit(self, W, H):
+        return self.x + self.width <= W and self.y + self.height <= H
