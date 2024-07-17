@@ -16,6 +16,6 @@ class Utilitaire:
             case "Best fit":
                 return best_fit(rectangles, W, H)
             case "Brute force":
-                return brute_force(rectangles, W, H)
+                return brute_force_2(rectangles, W, H)
             case "Brute force avec rotation":
                 return brute_force_rotation(rectangles, W, H)

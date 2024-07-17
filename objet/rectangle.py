@@ -94,6 +94,9 @@ class Rectangle:
 
     def rotate(self):
         return Rectangle(self.index, self.height, self.width)
+    
+    def area(self):
+        return self.width * self.height
 
     def can_fit_on_side(self, new_rect, W, H, side) -> bool:
         match side:
