@@ -1,4 +1,5 @@
 import itertools
+import copy
 
 def brute_force_rotation(rectangles, W, H):
     for rectangle in rectangles:
@@ -36,10 +37,10 @@ def brute_force_rotation(rectangles, W, H):
                 rectangle.y = None
         
         if len(temp_layout) == len(rectangles):
-            placed_rectangles = temp_layout
+            placed_rectangles = copy.deepcopy(temp_layout)
             break
-        elif len(temp_layout) > len(placed_rectangles):
-            placed_rectangles = temp_layout
+        if len(temp_layout) >= len(placed_rectangles) and sum(rect.area() for rect in temp_layout) > sum(rect.area() for rect in placed_rectangles):
+            placed_rectangles = copy.deepcopy(temp_layout)
 
     return [rect for rect in placed_rectangles if rect.x is not None and rect.y is not None]
     
