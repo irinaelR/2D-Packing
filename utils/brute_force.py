@@ -106,7 +106,7 @@ def brute_force(rectangles, W, H):
             permutation_finale = permutation
 
     # print(f"Permutation finale: {permutation_finale}")
-    return [rect for rect in placed_rectangles if rect.x is not None and rect.y is not None]
+    return [rect for rect in permutation_finale if rect.x is not None and rect.y is not None]
 
 
 def brute_force_2(rectangles, W, H):
