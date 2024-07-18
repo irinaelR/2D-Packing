@@ -59,12 +59,12 @@ class Statistique(Frame):
         self.formes = form
         self.formes_fitted = form_fitted
 
-        occupee = self.calcul_surface_form(self.formes_fitted)
-        self.surface_occupee.config(text=f"{occupee:,}")
+        # occupee = self.calcul_surface_form(self.formes_fitted)
+        # self.surface_occupee.config(text=f"{occupee:,}")
         
-        surface_totale = self.conteneur[0] * self.conteneur[1]
-        restante = surface_totale - occupee
-        self.surface_restante.config(text=f"{restante:,}")
+        # surface_totale = self.conteneur[0] * self.conteneur[1]
+        # restante = surface_totale - occupee
+        # self.surface_restante.config(text=f"{restante:,}")
         
-        self.form_given.config(text=f"{len(self.formes)}")
-        self.form_inserted.config(text=f"{len(self.formes_fitted)}")
+        # self.form_given.config(text=f"{len(self.formes)}")
+        # self.form_inserted.config(text=f"{len(self.formes_fitted)}")

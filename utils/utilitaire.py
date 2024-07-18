@@ -53,8 +53,8 @@ class Utilitaire:
         form.y = bounds[1]
         scale_factor = 1
         for x, y in coords:
-            form.X.append(x * scale_factor)
-            form.Y.append(y * scale_factor)
+            form.coords.append(x * scale_factor)
+            form.coords.append(y * scale_factor)
         return form
     
     @staticmethod
