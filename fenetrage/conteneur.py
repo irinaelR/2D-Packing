@@ -48,7 +48,9 @@ class Conteneur(Frame):
             form.undraw(self.canvas)
             
         self.fit_chosen = fit
-        self.formes_fitted = Utilitaire.choose_fit(self.fit_chosen, self.formes, int(self.canvas.cget('width')), int(self.canvas.cget('height')))
+        formes_fitted_temp = Utilitaire.choose_fit(self.fit_chosen, self.formes, int(self.canvas.cget('width')), int(self.canvas.cget('height')))
+        self.formes_fitted = Utilitaire.polygon_to_canvas_element(formes_fitted_temp)
+        
         print(f"Longueur de fitted {self.formes_fitted}")
         
         for form in self.formes_fitted:

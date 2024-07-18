@@ -11,6 +11,9 @@ class Forme(ABC):
         self._x: int = None
         self._y: int = None
         
+        self.X: list = list()
+        self.Y: list = list()
+        
         self._canvas_id: int = None
         self._text_id: int = None
         self._color: str = Forme.random_color_generator()
@@ -61,10 +64,13 @@ class Forme(ABC):
     @staticmethod
     def random_color_generator():
         return "#"+''.join([random.choice('0123456789ABCDEF') for _ in range(6)])
-    
-    @abstractmethod
+
     def draw(self, canvas: Canvas):
-        pass
+        coords = [self.X, self.Y]
+        self.canvas_id = canvas.create_polygon(coords, fill = self.color, outline="black")
+        center_x = (self.X[0] + self.X[1] + self.X[2]) / 3
+        center_y = (self.Y[0] + self.Y[1] + self.Y[2]) / 3
+        self.text_id = canvas.create_text(center_x, center_y, text=str(self.index), font=("Helvetica", 12))
     
     def undraw(self, canvas: Canvas):
         if self.canvas_id:
